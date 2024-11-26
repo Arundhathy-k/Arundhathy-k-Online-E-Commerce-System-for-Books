@@ -6,15 +6,16 @@ import com.kovan.repository.BookRepository;
 import com.kovan.repository.InventoryTransactionRepository;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
-public class InventoryManagementService {
+public class InventoryTransactionService {
 
     private final BookRepository bookRepository;
 
     private final InventoryTransactionRepository inventoryTransactionRepository;
 
-    public InventoryManagementService(BookRepository bookRepository, InventoryTransactionRepository inventoryTransactionRepository) {
+    public InventoryTransactionService(BookRepository bookRepository, InventoryTransactionRepository inventoryTransactionRepository) {
         this.bookRepository = bookRepository;
         this.inventoryTransactionRepository = inventoryTransactionRepository;
     }
@@ -48,6 +49,35 @@ public class InventoryManagementService {
         transaction.setNotes(notes);
 
         inventoryTransactionRepository.save(transaction);
+    }
+    public InventoryTransaction addTransaction(Long bookId, String transactionType, int quantity, String notes) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new IllegalArgumentException("Book not found"));
+
+        InventoryTransaction transaction = new InventoryTransaction();
+        transaction.setBook(book);
+        transaction.setTransactionType(transactionType);
+        transaction.setQuantity(quantity);
+        transaction.setTransactionDate(LocalDate.now());
+        transaction.setNotes(notes);
+
+        return inventoryTransactionRepository.save(transaction);
+    }
+
+    public List<InventoryTransaction> getAllTransactions() {
+        return inventoryTransactionRepository.findAll();
+    }
+
+    public InventoryTransaction getTransactionById(Long transactionId) {
+        return inventoryTransactionRepository.findById(transactionId)
+                .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
+    }
+
+    public void deleteTransaction(Long transactionId) {
+        if (!inventoryTransactionRepository.existsById(transactionId)) {
+            throw new IllegalArgumentException("Transaction not found");
+        }
+        inventoryTransactionRepository.deleteById(transactionId);
     }
 }
 
