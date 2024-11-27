@@ -28,12 +28,10 @@ public class ReviewService {
         Optional<Review> existingReview = reviewRepository.findByBookBookId(bookId);
 
         Review review = existingReview.orElseGet(() -> {
-            Review newReview = new Review();
-            newReview.setUser(userRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("User not found!")));
-            newReview.setBook(bookRepository.findById(bookId)
-                    .orElseThrow(() -> new RuntimeException("Book not found!")));
-            return newReview;
+           return Review.builder().user(userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found!"))).book(bookRepository.findById(bookId)
+                    .orElseThrow(() -> new RuntimeException("Book not found!"))).build();
+
         });
 
         review.setRating(rating);
@@ -43,7 +41,7 @@ public class ReviewService {
         return reviewRepository.save(review);
     }
 
-    public void deleteReview(Long userId, Long bookId) {
+    public void deleteReview(Long userId) {
         Review review = reviewRepository.findByBookBookId(userId)
                 .orElseThrow(() -> new RuntimeException("Review not found!"));
 

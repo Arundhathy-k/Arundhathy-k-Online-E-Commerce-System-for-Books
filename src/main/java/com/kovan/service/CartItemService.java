@@ -31,10 +31,10 @@ public class CartItemService {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new IllegalArgumentException("Book not found"));
 
-        CartItem cartItem = new CartItem();
-        cartItem.setCart(cart);
-        cartItem.setBook(book);
-        cartItem.setQuantity(quantity);
+        CartItem cartItem = CartItem.builder()
+                .cart(cart)
+                .book(book)
+                .quantity(quantity).build();
 
         return cartItemRepository.save(cartItem);
     }

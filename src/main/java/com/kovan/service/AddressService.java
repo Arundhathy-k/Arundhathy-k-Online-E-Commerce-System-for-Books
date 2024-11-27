@@ -26,6 +26,7 @@ public class AddressService {
     public Address getAddressesById(Long id) {
         return addressRepository.findById(id).orElseThrow(() -> new RuntimeException("Address not found!"));
     }
+
     public Address addAddress(Long userId, Address address) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));

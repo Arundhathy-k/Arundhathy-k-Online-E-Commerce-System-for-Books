@@ -7,6 +7,9 @@ import lombok.*;
 @Entity
 @Table(name = "addresses")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

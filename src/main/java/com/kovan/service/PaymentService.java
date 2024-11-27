@@ -32,7 +32,7 @@ public class PaymentService {
 
         Payment savedPayment = paymentRepository.save(paymentDetails);
 
-        if ("COMPLETED".equals(paymentDetails.getPaymentStatus())) {
+        if (paymentDetails.getPaymentStatus().equals("COMPLETED")) {
             order.setOrderStatus("SHIPPED");
             orderRepository.save(order);
         }

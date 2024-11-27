@@ -33,7 +33,7 @@ public class ShoppingCartService {
     public ShoppingCart getOrCreateCart(Long userId) {
         return shoppingCartRepository.findByUserUserId(userId)
                 .orElseGet(() -> {
-                    ShoppingCart cart = new ShoppingCart();
+                    ShoppingCart cart = ShoppingCart.builder().build();
                     User user = userRepository.findById(userId)
                             .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
                     cart.setUser(user);
@@ -56,10 +56,10 @@ public class ShoppingCartService {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new RuntimeException("Book not found!"));
 
-        CartItem newItem = new CartItem();
-        newItem.setCart(cart);
-        newItem.setBook(book);
-        newItem.setQuantity(quantity);
+        CartItem newItem = CartItem.builder()
+                .cart(cart)
+                .book(book)
+                .quantity(quantity).build();
         return cartItemRepository.save(newItem);
     }
 

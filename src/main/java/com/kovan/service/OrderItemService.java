@@ -34,12 +34,12 @@ public class OrderItemService {
 
         BigDecimal totalPrice = unitPrice.multiply(BigDecimal.valueOf(quantity));
 
-        OrderItem orderItem = new OrderItem();
-        orderItem.setOrder(order);
-        orderItem.setBook(book);
-        orderItem.setQuantity(quantity);
-        orderItem.setUnitPrice(unitPrice);
-        orderItem.setTotalPrice(totalPrice);
+        OrderItem orderItem = OrderItem.builder()
+                .order(order)
+                .book(book)
+                .quantity(quantity)
+                .unitPrice(unitPrice)
+                .totalPrice(totalPrice).build();
 
         return orderItemRepository.save(orderItem);
     }

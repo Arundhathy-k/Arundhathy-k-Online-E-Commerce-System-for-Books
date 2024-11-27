@@ -20,20 +20,21 @@ public class InventoryTransactionService {
         this.inventoryTransactionRepository = inventoryTransactionRepository;
     }
 
-    public void updateInventory(Long bookId, int quantity, String transactionType, String notes) {
-        Book book = bookRepository.findById(bookId)
+    public InventoryTransaction updateInventory(Long transactionId, InventoryTransaction inventoryTransaction) {
+
+        Book book = bookRepository.findById(inventoryTransaction.getBook().getBookId())
                 .orElseThrow(() -> new RuntimeException("Book not found!"));
 
-        if (transactionType.equalsIgnoreCase("Purchase") && book.getStockQuantity() < quantity) {
+        if (inventoryTransaction.getTransactionType().equalsIgnoreCase("Purchase") && book.getStockQuantity() < inventoryTransaction.getQuantity()) {
             throw new RuntimeException("Insufficient stock!");
         }
 
-        switch (transactionType.toLowerCase()) {
+        switch (inventoryTransaction.getTransactionType().toLowerCase()) {
             case "purchase":
-                book.setStockQuantity(book.getStockQuantity() - quantity);
+                book.setStockQuantity(book.getStockQuantity() - inventoryTransaction.getQuantity());
                 break;
             case "restock":
-                book.setStockQuantity(book.getStockQuantity() + quantity);
+                book.setStockQuantity(book.getStockQuantity() + inventoryTransaction.getQuantity());
                 break;
             default:
                 throw new IllegalArgumentException("Invalid transaction type!");
@@ -41,25 +42,25 @@ public class InventoryTransactionService {
 
         bookRepository.save(book);
 
-        InventoryTransaction transaction = new InventoryTransaction();
-        transaction.setBook(book);
-        transaction.setQuantity(quantity);
-        transaction.setTransactionType(transactionType);
-        transaction.setTransactionDate(LocalDate.now());
-        transaction.setNotes(notes);
+        InventoryTransaction transaction = getTransactionById(transactionId);
+              transaction.setBook(book);
+              transaction.setQuantity(inventoryTransaction.getQuantity());
+              transaction.setTransactionType(inventoryTransaction.getTransactionType());
+              transaction.setTransactionDate(LocalDate.now());
+              transaction.setNotes(inventoryTransaction.getNotes());
 
-        inventoryTransactionRepository.save(transaction);
+       return inventoryTransactionRepository.save(transaction);
     }
     public InventoryTransaction addTransaction(Long bookId, String transactionType, int quantity, String notes) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new IllegalArgumentException("Book not found"));
 
-        InventoryTransaction transaction = new InventoryTransaction();
-        transaction.setBook(book);
-        transaction.setTransactionType(transactionType);
-        transaction.setQuantity(quantity);
-        transaction.setTransactionDate(LocalDate.now());
-        transaction.setNotes(notes);
+        InventoryTransaction transaction = InventoryTransaction.builder()
+                .book(book)
+                .quantity(quantity)
+                .transactionType(transactionType)
+                .transactionDate(LocalDate.now())
+                .notes(notes).build();
 
         return inventoryTransactionRepository.save(transaction);
     }

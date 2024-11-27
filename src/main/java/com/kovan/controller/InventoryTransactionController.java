@@ -1,5 +1,6 @@
 package com.kovan.controller;
 
+import com.kovan.entities.Address;
 import com.kovan.entities.InventoryTransaction;
 import com.kovan.service.InventoryTransactionService;
 import org.springframework.http.HttpStatus;
@@ -42,6 +43,12 @@ public class InventoryTransactionController {
     public ResponseEntity<Void> deleteTransaction(@PathVariable Long transactionId) {
         inventoryTransactionService.deleteTransaction(transactionId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<InventoryTransaction> updateTransaction(@PathVariable Long id, @RequestBody InventoryTransaction inventoryTransaction) {
+        InventoryTransaction updatedInventoryTransaction = inventoryTransactionService.updateInventory(id,inventoryTransaction);
+        return ResponseEntity.ok(updatedInventoryTransaction);
     }
 }
 
