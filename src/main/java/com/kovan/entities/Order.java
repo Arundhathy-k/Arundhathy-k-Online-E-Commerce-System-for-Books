@@ -38,7 +38,7 @@ public class Order {
     @JoinColumn(name = "shipping_address_id", nullable = false)
     private Address shippingAddress;
 
-    @OneToOne()
+    @OneToOne
     @JoinColumn(name = "payment_id")
     @JsonManagedReference
     private Payment payment;

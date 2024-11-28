@@ -4,7 +4,7 @@ import com.kovan.entities.Category;
 import com.kovan.repository.CategoryRepository;
 import com.kovan.service.CategoryService;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,7 +22,7 @@ class CategoryServiceIT {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    @BeforeEach
+    @AfterEach
     public void setup() {
         categoryRepository.deleteAll();
     }
