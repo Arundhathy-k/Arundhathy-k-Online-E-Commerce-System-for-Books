@@ -1,11 +1,8 @@
 package com.kovan.entities;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import jakarta.persistence.*;
-import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Entity

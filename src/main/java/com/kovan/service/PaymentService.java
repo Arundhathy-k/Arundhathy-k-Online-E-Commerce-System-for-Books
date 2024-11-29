@@ -5,6 +5,8 @@ import com.kovan.entities.Payment;
 import com.kovan.repository.OrderRepository;
 import com.kovan.repository.PaymentRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -79,6 +81,11 @@ public class PaymentService {
         }
 
         paymentRepository.deleteById(paymentId);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public Payment save(Payment payment) {
+        return paymentRepository.save(payment);
     }
 }
 

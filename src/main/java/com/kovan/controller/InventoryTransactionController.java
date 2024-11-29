@@ -1,6 +1,5 @@
 package com.kovan.controller;
 
-import com.kovan.entities.Address;
 import com.kovan.entities.InventoryTransaction;
 import com.kovan.service.InventoryTransactionService;
 import org.springframework.http.HttpStatus;
