@@ -6,7 +6,6 @@ import com.kovan.service.ShoppingCartService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -51,7 +50,7 @@ class ShoppingCartServiceIT {
                 Book.builder()
                         .title("Effective Java")
                         .author("Joshua Bloch")
-                        .price(BigDecimal.valueOf(50.00))
+                        .price(50.00)
                         .category(testCategory)
                         .build()
         );

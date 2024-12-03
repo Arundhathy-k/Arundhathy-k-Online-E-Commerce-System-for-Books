@@ -2,11 +2,11 @@ package com.kovan.integrationTestCases;
 
 import com.kovan.entities.Book;
 import com.kovan.entities.Category;
-import com.kovan.entities.InventoryTransaction;
+import com.kovan.entities.InventoryManagement;
 import com.kovan.repository.BookRepository;
 import com.kovan.repository.CategoryRepository;
-import com.kovan.repository.InventoryTransactionRepository;
-import com.kovan.service.InventoryTransactionService;
+import com.kovan.repository.InventoryManagementRepository;
+import com.kovan.service.InventoryManagementService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,16 +16,16 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-class InventoryTransactionServiceIT {
+class InventoryManagementServiceIT {
 
     @Autowired
-    private InventoryTransactionService transactionService;
+    private InventoryManagementService transactionService;
 
     @Autowired
     private BookRepository bookRepository;
 
     @Autowired
-    private InventoryTransactionRepository transactionRepository;
+    private InventoryManagementRepository transactionRepository;
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -45,7 +45,7 @@ class InventoryTransactionServiceIT {
                 .title("Test Book")
                 .author("Test Author")
                 .genre("Fiction")
-                .price(new java.math.BigDecimal("20.99"))
+                .price(20.99)
                 .isbn("123-456-789")
                 .publicationYear(2023)
                 .publisher("Test Publisher")
@@ -60,7 +60,7 @@ class InventoryTransactionServiceIT {
     @Test
     void addTransactionTest() {
 
-        InventoryTransaction transaction = transactionService.addTransaction(
+        InventoryManagement transaction = transactionService.addTransaction(
                 testBook.getBookId(),
                 "Purchase",
                 10,
@@ -79,21 +79,21 @@ class InventoryTransactionServiceIT {
     @Test
     void updateTransactionTest() {
 
-        InventoryTransaction transaction = transactionService.addTransaction(
+        InventoryManagement transaction = transactionService.addTransaction(
                 testBook.getBookId(),
                 "Purchase",
                 10,
                 "Initial stock purchase"
         );
 
-        InventoryTransaction updatedTransaction = InventoryTransaction.builder()
+        InventoryManagement updatedTransaction = InventoryManagement.builder()
                 .book(testBook)
                 .quantity(15)
                 .transactionType("Restock")
                 .notes("Added more stock")
                 .build();
 
-        InventoryTransaction result = transactionService.updateInventory(
+        InventoryManagement result = transactionService.updateInventory(
                 transaction.getInventoryTransactionId(),
                 updatedTransaction
         );
@@ -112,19 +112,19 @@ class InventoryTransactionServiceIT {
         transactionService.addTransaction(testBook.getBookId(), "Purchase", 10, "Initial stock purchase");
         transactionService.addTransaction(testBook.getBookId(), "Restock", 5, "Restocking inventory");
 
-        List<InventoryTransaction> transactions = transactionService.getAllTransactions();
+        List<InventoryManagement> transactions = transactionService.getAllTransactions();
 
         assertThat(transactions).hasSize(2);
-        assertThat(transactions).extracting(InventoryTransaction::getTransactionType)
+        assertThat(transactions).extracting(InventoryManagement::getTransactionType)
                 .containsExactlyInAnyOrder("Purchase", "Restock");
-        assertThat(transactions).extracting(InventoryTransaction::getQuantity)
+        assertThat(transactions).extracting(InventoryManagement::getQuantity)
                 .containsExactlyInAnyOrder(10, 5);
     }
 
     @Test
     void deleteTransactionTest() {
 
-        InventoryTransaction transaction = transactionService.addTransaction(
+        InventoryManagement transaction = transactionService.addTransaction(
                 testBook.getBookId(),
                 "Purchase",
                 10,

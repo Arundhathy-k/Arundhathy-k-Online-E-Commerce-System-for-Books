@@ -12,7 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import java.math.BigDecimal;
 import java.util.List;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -41,7 +40,7 @@ class OrderItemServiceTest {
     private final Book book =  Book.builder()
             .bookId(1L)
             .title("Test Book")
-            .price(BigDecimal.valueOf(50.00))
+           .price(50.00)
             .build();
 
     private final OrderItem orderItem = OrderItem.builder()
@@ -49,8 +48,8 @@ class OrderItemServiceTest {
             .order(order)
             .book(book)
             .quantity(2)
-            .unitPrice(BigDecimal.valueOf(50.00))
-            .totalPrice(BigDecimal.valueOf(100.00))
+            .unitPrice(50.00)
+            .totalPrice(100.00)
             .build();
 
     @Test
@@ -64,7 +63,7 @@ class OrderItemServiceTest {
                 order.getOrderId(),
                 book.getBookId(),
                 2,
-                BigDecimal.valueOf(50.00)
+                (50.00)
         );
 
         assertNotNull(result);

@@ -10,7 +10,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import java.math.BigDecimal;
 import java.util.List;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -32,7 +31,7 @@ class BookServiceTest {
                 .bookId(1L)
                 .title("Effective Java")
                 .author("Joshua Bloch")
-                .price(BigDecimal.valueOf(200))
+                .price(200.00)
                 .category(category)
                 .isbn("978-0134685991")
                 .publicationYear(2018)
@@ -104,7 +103,7 @@ class BookServiceTest {
                 .bookId(1L)
                 .title("Updated Title")
                 .author("Updated Author")
-                .price(BigDecimal.valueOf(50.00))
+                .price(50.00)
                 .category(updatedCategory)
                 .isbn("123-4567890123")
                 .publicationYear(2021)

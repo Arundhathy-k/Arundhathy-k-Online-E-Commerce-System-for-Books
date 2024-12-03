@@ -1,16 +1,14 @@
 package com.kovan.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import lombok.*;
-import java.util.List;
 
 @Data
 @Entity
 @Builder
-@Table(name = "categories")
+@Table(name = "category")
 @AllArgsConstructor
 @NoArgsConstructor
 public class Category {
@@ -21,9 +19,5 @@ public class Category {
 
     private String name;
     private String description;
-
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    @JsonBackReference
-    private List<Book> books;
 
 }

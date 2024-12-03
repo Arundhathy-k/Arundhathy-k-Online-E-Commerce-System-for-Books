@@ -1,6 +1,5 @@
 package com.kovan.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "cart_items")
+@Table(name = "cart_item")
 @Data
 @Builder
 @AllArgsConstructor
@@ -19,14 +18,12 @@ public class CartItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cartItemId;
 
-    @ManyToOne
-    @JoinColumn(name = "cart_id", nullable = false)
-    @JsonBackReference
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "cartId")
     private ShoppingCart cart;
 
-    @ManyToOne
-    @JoinColumn(name = "book_id", nullable = false)
-    @JsonBackReference
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "bookId")
     private Book book;
 
     private int quantity;

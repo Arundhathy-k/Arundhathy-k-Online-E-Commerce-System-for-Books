@@ -1,6 +1,5 @@
 package com.kovan.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
@@ -8,11 +7,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "payments")
+@Table(name = "payment")
 @Data
 @Builder
 @AllArgsConstructor
@@ -29,11 +27,8 @@ public class Payment {
 
     private String  paymentStatus;
 
-    private BigDecimal amount;
+    private Double amount;
 
     private String paymentReferenceNumber;
 
-    @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    @JsonBackReference
-    private Order order;
 }

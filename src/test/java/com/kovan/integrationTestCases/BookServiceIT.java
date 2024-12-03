@@ -10,7 +10,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,7 +38,7 @@ class BookServiceIT {
     Book book = Book.builder()
             .title("Test Book")
             .author("Test Author")
-            .price(BigDecimal.valueOf(19.99))
+            .price(19.99)
             .isbn("1234567890123")
             .publicationYear(2023)
             .stockQuantity(10)
@@ -62,8 +61,8 @@ class BookServiceIT {
     @Test
     void getAllBooksTest() {
         categoryRepository.save(testCategory);
-        bookRepository.save(Book.builder().title("Book 1").author("Author 1").price(BigDecimal.valueOf(15.99)).isbn("1234567890456").publicationYear(2023).stockQuantity(5).category(testCategory).build());
-        bookRepository.save(Book.builder().title("Book 2").author("Author 2").price(BigDecimal.valueOf(25.99)).isbn("1234567890789").publicationYear(2021).stockQuantity(3).category(testCategory).build());
+        bookRepository.save(Book.builder().title("Book 1").author("Author 1").price(15.99).isbn("1234567890456").publicationYear(2023).stockQuantity(5).category(testCategory).build());
+        bookRepository.save(Book.builder().title("Book 2").author("Author 2").price(25.99).isbn("1234567890789").publicationYear(2021).stockQuantity(3).category(testCategory).build());
 
         List<Book> books = bookService.getAllBooks();
 
@@ -90,7 +89,7 @@ class BookServiceIT {
         Book updatedBook = Book.builder()
                 .title("Updated Title")
                 .author("Updated Author")
-                .price(BigDecimal.valueOf(12.99))
+                .price(12.99)
                 .isbn("1234567890789")
                 .publicationYear(2021)
                 .stockQuantity(5)
@@ -102,7 +101,7 @@ class BookServiceIT {
         assertThat(result).isNotNull();
         assertThat(result.getTitle()).isEqualTo("Updated Title");
         assertThat(result.getAuthor()).isEqualTo("Updated Author");
-        assertThat(result.getPrice()).isEqualTo(BigDecimal.valueOf(12.99));
+        assertThat(result.getPrice()).isEqualTo(12.99);
     }
 
     @Test

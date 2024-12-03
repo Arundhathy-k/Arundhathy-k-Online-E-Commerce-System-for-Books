@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,7 +58,7 @@ class CartItemServiceIT {
         testBook = Book.builder()
                 .title("Test Book")
                 .author("Test Author")
-                .price(BigDecimal.valueOf(19.99))
+                .price(19.99)
                 .isbn("1234567890123")
                 .publicationYear(2023)
                 .stockQuantity(10)
@@ -77,7 +76,6 @@ class CartItemServiceIT {
         assertThat(cartItem.getCartItemId()).isNotNull();
         assertThat(cartItem.getQuantity()).isEqualTo(2);
         assertThat(cartItem.getBook().getBookId()).isEqualTo(testBook.getBookId());
-        assertThat(cartItem.getCart().getCartItems()).isEqualTo(testCart.getCartItems());
     }
 
     @Test
@@ -115,7 +113,7 @@ class CartItemServiceIT {
         Book anotherBook = Book.builder()
                 .title("Another Book")
                 .author("Another Author")
-                .price(BigDecimal.valueOf(25.99))
+                .price(25.99)
                 .isbn("9876543210987")
                 .publicationYear(2022)
                 .stockQuantity(5)

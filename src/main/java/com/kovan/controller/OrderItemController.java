@@ -5,7 +5,6 @@ import com.kovan.service.OrderItemService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -22,7 +21,7 @@ public class OrderItemController {
     public ResponseEntity<OrderItem> addOrderItem(@RequestParam Long orderId,
                                                   @RequestParam Long bookId,
                                                   @RequestParam int quantity,
-                                                  @RequestParam BigDecimal unitPrice) {
+                                                  @RequestParam Double unitPrice) {
         OrderItem orderItem = orderItemService.addOrderItem(orderId, bookId, quantity, unitPrice);
         return ResponseEntity.status(HttpStatus.CREATED).body(orderItem);
     }

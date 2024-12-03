@@ -1,9 +1,7 @@
 package com.kovan.integrationTestCases;
 
 import com.kovan.entities.Address;
-import com.kovan.entities.User;
 import com.kovan.repository.AddressRepository;
-import com.kovan.repository.UserRepository;
 import com.kovan.service.AddressService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
@@ -21,60 +19,74 @@ class AddressServiceIT {
     private AddressService addressService;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private AddressRepository addressRepository;
 
     @AfterEach
     void cleanUp() {
         addressRepository.deleteAll();
-        userRepository.deleteAll();
     }
 
-    User user = User.builder()
-            .firstName("Test User")
-            .email("Test@gmail.com")
-            .build();
-    Address address = Address.builder()
+    private final Address address = Address.builder()
             .street("123 Test St")
             .city("Test City")
             .state("Test State")
-            .user(user)
             .postalCode("12345")
             .country("Test Country")
             .build();
 
     @Test
     void testAddAddress() {
-
-        user = userRepository.save(user);
-
-        Address savedAddress = addressService.addAddress(user.getUserId(), address);
+        Address savedAddress = addressService.addAddress(address);
 
         assertNotNull(savedAddress);
         assertNotNull(savedAddress.getAddressId());
         assertEquals("123 Test St", savedAddress.getStreet());
-        assertEquals(user.getUserId(), savedAddress.getUser().getUserId());
+        assertEquals("Test City", savedAddress.getCity());
+        assertEquals("Test State", savedAddress.getState());
+        assertEquals("12345", savedAddress.getPostalCode());
+        assertEquals("Test Country", savedAddress.getCountry());
     }
 
     @Test
-    void testGetAddressesByUserId() {
+    void testGetAddressesById() {
+        Address savedAddress = addressRepository.save(address);
 
-        user = userRepository.save(user);
-        addressRepository.save(address);
+        Address fetchedAddress = addressService.getAddressesById(savedAddress.getAddressId());
 
-        List<Address> addresses = addressService.getAddressesByUserId(user.getUserId());
+        assertNotNull(fetchedAddress);
+        assertEquals(savedAddress.getAddressId(), fetchedAddress.getAddressId());
+        assertEquals("123 Test St", fetchedAddress.getStreet());
+    }
+
+    @Test
+    void testGetAllAddresses() {
+        Address address1 = Address.builder()
+                .street("Street 1")
+                .city("City 1")
+                .state("State 1")
+                .postalCode("11111")
+                .country("Country 1")
+                .build();
+        Address address2 = Address.builder()
+                .street("Street 2")
+                .city("City 2")
+                .state("State 2")
+                .postalCode("22222")
+                .country("Country 2")
+                .build();
+
+        addressRepository.save(address1);
+        addressRepository.save(address2);
+
+        List<Address> addresses = addressService.getAllAddresses();
+
         assertNotNull(addresses);
-        assertEquals(1, addresses.size());
+        assertEquals(2, addresses.size());
     }
 
     @Test
     void testUpdateAddress() {
-
-        user = userRepository.save(user);
-
-        address = addressRepository.save(address);
+        Address savedAddress = addressRepository.save(address);
 
         Address updatedAddress = Address.builder()
                 .street("New Street")
@@ -84,24 +96,39 @@ class AddressServiceIT {
                 .country("New Country")
                 .build();
 
-        Address savedAddress = addressService.updateAddress(address.getAddressId(), updatedAddress);
+        Address result = addressService.updateAddress(savedAddress.getAddressId(), updatedAddress);
 
-        assertNotNull(savedAddress);
-        assertEquals("New Street", savedAddress.getStreet());
-        assertEquals("New City", savedAddress.getCity());
-        assertEquals("New State", savedAddress.getState());
-        assertEquals("11111", savedAddress.getPostalCode());
-        assertEquals("New Country", savedAddress.getCountry());
+        assertNotNull(result);
+        assertEquals("New Street", result.getStreet());
+        assertEquals("New City", result.getCity());
+        assertEquals("New State", result.getState());
+        assertEquals("11111", result.getPostalCode());
+        assertEquals("New Country", result.getCountry());
+    }
+
+    @Test
+    void testUpdateAddressThrowsException() {
+        Long invalidAddressId = 999L;
+
+        Address updatedAddress = Address.builder()
+                .street("New Street")
+                .city("New City")
+                .state("New State")
+                .postalCode("11111")
+                .country("New Country")
+                .build();
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> addressService.updateAddress(invalidAddressId, updatedAddress));
+
+        assertEquals("Address not found with ID: " + invalidAddressId, exception.getMessage());
     }
 
     @Test
     void testDeleteAddress() {
+        Address savedAddress = addressRepository.save(address);
 
-        user = userRepository.save(user);
-
-        address = addressRepository.save(address);
-
-        Long addressId = address.getAddressId();
+        Long addressId = savedAddress.getAddressId();
         assertTrue(addressRepository.existsById(addressId));
 
         addressService.deleteAddress(addressId);
@@ -110,16 +137,12 @@ class AddressServiceIT {
     }
 
     @Test
-    void testGetAddressesById() {
+    void testDeleteAddressThrowsException() {
+        Long invalidAddressId = 999L;
 
-        user = userRepository.save(user);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> addressService.deleteAddress(invalidAddressId));
 
-        address = addressRepository.save(address);
-
-        Address fetchedAddress = addressService.getAddressesById(address.getAddressId());
-
-        assertNotNull(fetchedAddress);
-        assertEquals(address.getAddressId(), fetchedAddress.getAddressId());
-        assertEquals("123 Test St", fetchedAddress.getStreet());
+        assertEquals("Address not found with ID: " + invalidAddressId, exception.getMessage());
     }
 }

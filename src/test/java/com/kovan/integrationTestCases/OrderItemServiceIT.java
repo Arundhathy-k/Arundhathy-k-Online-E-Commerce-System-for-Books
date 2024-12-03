@@ -8,8 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -51,12 +50,11 @@ class OrderItemServiceIT {
         Address address = Address.builder()
                 .city("Test City")
                 .state("Test State")
-                .user(user)
                 .build();
         addressRepository.save(address);
         savedOrder = orderRepository.save(
                 Order.builder()
-                        .orderDate(LocalDateTime.now())
+                        .orderDate(LocalDate.now())
                         .user(user)
                         .shippingAddress(address)
                         .build());
@@ -68,7 +66,7 @@ class OrderItemServiceIT {
                 Book.builder()
                         .title("Test Book")
                         .author("Author")
-                        .price(BigDecimal.valueOf(20.00))
+                        .price(20.00)
                         .category(testCategory)
                         .build()
         );
@@ -89,7 +87,7 @@ class OrderItemServiceIT {
     void testAddOrderItem() {
 
         int quantity = 2;
-        BigDecimal unitPrice = BigDecimal.valueOf(20.00);
+        Double unitPrice = 20.00;
 
         OrderItem orderItem = orderItemService.addOrderItem(
                 savedOrder.getOrderId(),
@@ -103,7 +101,7 @@ class OrderItemServiceIT {
         assertEquals(savedBook.getBookId(), orderItem.getBook().getBookId());
         assertEquals(quantity, orderItem.getQuantity());
         assertEquals(unitPrice, orderItem.getUnitPrice());
-        assertEquals(unitPrice.multiply(BigDecimal.valueOf(quantity)), orderItem.getTotalPrice());
+        assertEquals((unitPrice * quantity), orderItem.getTotalPrice());
     }
 
     @Test
@@ -113,16 +111,16 @@ class OrderItemServiceIT {
                 .order(savedOrder)
                 .book(savedBook)
                 .quantity(1)
-                .unitPrice(BigDecimal.valueOf(20.00))
-                .totalPrice(BigDecimal.valueOf(20.00))
+                .unitPrice(20.00)
+                .totalPrice((20.00))
                 .build();
 
         OrderItem orderItem2 = OrderItem.builder()
                 .order(savedOrder)
                 .book(savedBook)
                 .quantity(3)
-                .unitPrice(BigDecimal.valueOf(15.00))
-                .totalPrice(BigDecimal.valueOf(45.00))
+                .unitPrice(15.00)
+                .totalPrice(45.00)
                 .build();
 
         orderItemRepository.saveAll(List.of(orderItem1, orderItem2));
@@ -140,8 +138,8 @@ class OrderItemServiceIT {
                         .order(savedOrder)
                         .book(savedBook)
                         .quantity(2)
-                        .unitPrice(BigDecimal.valueOf(20.00))
-                        .totalPrice(BigDecimal.valueOf(40.00))
+                        .unitPrice(20.00)
+                        .totalPrice(40.00)
                         .build()
         );
 
@@ -159,8 +157,8 @@ class OrderItemServiceIT {
                         .order(savedOrder)
                         .book(savedBook)
                         .quantity(2)
-                        .unitPrice(BigDecimal.valueOf(20.00))
-                        .totalPrice(BigDecimal.valueOf(40.00))
+                        .unitPrice(20.00)
+                        .totalPrice(40.00)
                         .build()
         );
 

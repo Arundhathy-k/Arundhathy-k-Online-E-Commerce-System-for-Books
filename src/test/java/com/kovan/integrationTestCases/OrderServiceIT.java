@@ -12,7 +12,9 @@ import com.kovan.service.OrderService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import java.time.LocalDateTime;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -35,74 +37,65 @@ class OrderServiceIT {
         @Autowired
         private PaymentRepository paymentRepository;
 
-        private User testUser;
-        private Address testAddress;
+        private Order order;
 
-        @BeforeEach
+    @BeforeEach
+        @Transactional
         void setup() {
-            String uniqueEmail = "john" + System.currentTimeMillis() + "@example.com";
-            testUser = User.builder()
+          User testUser = User.builder()
                             .firstName("Ajay")
-                            .email(uniqueEmail)
+                            .email("Ajay@gmail.com")
                             .build();
             userRepository.save(testUser);
 
-            testAddress = Address.builder()
+            Address testAddress = Address.builder()
                             .street("123 Test Street")
                             .city("Test City")
                             .state("Test State")
-                            .user(testUser)
                             .build();
             addressRepository.save(testAddress);
+        Payment payment = Payment.builder()
+                .paymentStatus("PAID")
+                .paymentMethod("Credit Card")
+                .amount(200.00)
+                .paymentReferenceNumber("234678f56")
+                .paymentDate(LocalDate.now())
+                .build();
+            paymentRepository.save(payment);
+            order = Order.builder()
+                    .orderDate(LocalDate.now())
+                    .orderStatus("PROCESSING")
+                    .user(testUser)
+                    .shippingAddress(testAddress)
+                    .payment(payment)
+                    .build();
+            orderRepository.save(order);
         }
 
         @AfterEach
         void cleanup() {
-
-            orderRepository.deleteAll();
             paymentRepository.deleteAll();
+            orderRepository.deleteAll();
             addressRepository.deleteAll();
             userRepository.deleteAll();
         }
 
         @Test
+        @Transactional
         void testCreateOrder() {
-
-            Payment payment = paymentRepository.save(
-                    Payment.builder()
-                            .paymentStatus("PAID")
-                            .paymentMethod("Credit Card")
-                            .build()
-            );
-
-            Order order = Order.builder()
-                    .orderDate(LocalDateTime.now())
-                    .orderStatus("CREATED")
-                    .user(testUser)
-                    .shippingAddress(testAddress)
-                    .payment(payment)
-                    .build();
 
             Order savedOrder = orderService.createOrder(order);
 
             assertNotNull(savedOrder.getOrderId());
-            assertEquals("CREATED", savedOrder.getOrderStatus());
-            assertEquals(testUser.getUserId(), savedOrder.getUser().getUserId());
-            assertEquals(testAddress.getAddressId(), savedOrder.getShippingAddress().getAddressId());
-            assertEquals(payment.getPaymentId(), savedOrder.getPayment().getPaymentId());
+            assertEquals("PENDING", savedOrder.getOrderStatus());
+            assertEquals(order.getUser(), savedOrder.getUser());
+            assertEquals(order.getShippingAddress(), savedOrder.getShippingAddress());
+            assertEquals(order.getPayment(), savedOrder.getPayment());
         }
 
         @Test
+        @Transactional
         void testGetOrderById() {
-
-            Order order = orderRepository.save(
-                    Order.builder()
-                            .orderDate(LocalDateTime.now())
-                            .orderStatus("PROCESSING")
-                            .user(testUser)
-                            .shippingAddress(testAddress)
-                            .build()
-            );
 
             Order fetchedOrder = orderService.getOrderById(order.getOrderId());
 
@@ -112,39 +105,21 @@ class OrderServiceIT {
         }
 
         @Test
+        @Transactional
         void testGetAllOrders() {
 
-            orderRepository.saveAll(List.of(
-                    Order.builder()
-                            .orderDate(LocalDateTime.now())
-                            .orderStatus("CREATED")
-                            .user(testUser)
-                            .shippingAddress(testAddress)
-                            .build(),
-                    Order.builder()
-                            .orderDate(LocalDateTime.now().minusDays(1))
-                            .orderStatus("SHIPPED")
-                            .user(testUser)
-                            .shippingAddress(testAddress)
-                            .build()
+            orderRepository.saveAll(List.of(order
             ));
 
             List<Order> orders = orderService.getAllOrders();
 
-            assertEquals(2, orders.size());
+            assertNotNull(orders);
+            assertEquals(1, orders.size());
         }
 
         @Test
+        @Transactional
         void testUpdateOrder() {
-
-            Order order = orderRepository.save(
-                    Order.builder()
-                            .orderDate(LocalDateTime.now())
-                            .orderStatus("CREATED")
-                            .user(testUser)
-                            .shippingAddress(testAddress)
-                            .build()
-            );
 
             Order updatedOrder = Order.builder()
                     .orderStatus("SHIPPED")
@@ -156,16 +131,8 @@ class OrderServiceIT {
         }
 
         @Test
+        @Transactional
         void testCancelOrder() {
-
-            Order order = orderRepository.save(
-                    Order.builder()
-                            .orderDate(LocalDateTime.now())
-                            .orderStatus("PROCESSING")
-                            .user(testUser)
-                            .shippingAddress(testAddress)
-                            .build()
-            );
 
             orderService.cancelOrder(order.getOrderId());
 

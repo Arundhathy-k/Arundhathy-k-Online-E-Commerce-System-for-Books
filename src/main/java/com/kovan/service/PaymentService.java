@@ -25,19 +25,21 @@ public class PaymentService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found!"));
 
-        if (!order.getOrderStatus().equals("PENDING")) {
+        if (!order.getOrderStatus().equalsIgnoreCase("PENDING")) {
             throw new RuntimeException("Payment can only be processed for pending orders!");
         }
 
-        paymentDetails.setOrder(order);
         paymentDetails.setPaymentDate(LocalDate.now());
 
         Payment savedPayment = paymentRepository.save(paymentDetails);
+        order.setPayment(savedPayment);
 
-        if (paymentDetails.getPaymentStatus().equals("COMPLETED")) {
+        if ("COMPLETED".equalsIgnoreCase(paymentDetails.getPaymentStatus())) {
             order.setOrderStatus("SHIPPED");
-            orderRepository.save(order);
+        } else if ("FAILED".equalsIgnoreCase(paymentDetails.getPaymentStatus())) {
+            order.setOrderStatus("PENDING");
         }
+        orderRepository.save(order);
 
         return savedPayment;
     }
@@ -63,11 +65,15 @@ public class PaymentService {
 
         Payment savedPayment = paymentRepository.save(existingPayment);
 
-        if (existingPayment.getOrder() != null && "COMPLETED".equals(savedPayment.getPaymentStatus())) {
-            Order order = existingPayment.getOrder();
+        Order order = orderRepository.findByPayment(savedPayment)
+                .orElseThrow(() -> new RuntimeException("Order not found for payment!"));
+
+        if ("COMPLETED".equalsIgnoreCase(savedPayment.getPaymentStatus())) {
             order.setOrderStatus("SHIPPED");
-            orderRepository.save(order);
+        } else if ("FAILED".equalsIgnoreCase(savedPayment.getPaymentStatus())) {
+            order.setOrderStatus("PENDING");
         }
+        orderRepository.save(order);
 
         return savedPayment;
     }
@@ -76,7 +82,7 @@ public class PaymentService {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new RuntimeException("Payment not found!"));
 
-        if (payment.getOrder() != null && "COMPLETED".equals(payment.getPaymentStatus())) {
+        if ("COMPLETED".equalsIgnoreCase(payment.getPaymentStatus())) {
             throw new RuntimeException("Cannot delete a completed payment associated with an order!");
         }
 

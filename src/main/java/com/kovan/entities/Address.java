@@ -1,11 +1,10 @@
 package com.kovan.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "addresses")
+@Table(name = "address")
 @Data
 @Builder
 @NoArgsConstructor
@@ -20,10 +19,5 @@ public class Address {
     private String state;
     private String postalCode;
     private String country;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    @JsonBackReference
-    private User user;
 
 }

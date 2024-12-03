@@ -10,7 +10,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import static org.mockito.Mockito.*;
@@ -29,20 +28,20 @@ class PaymentServiceTest {
     @InjectMocks
     private PaymentService paymentService;
 
-    private final Order order = Order.builder()
-                .orderId(1L)
-                .orderStatus("PENDING")
-                .build();
-
     private final Payment payment= Payment.builder()
                 .paymentId(1L)
                 .paymentDate(LocalDate.now())
                 .paymentMethod("CREDIT_CARD")
                 .paymentStatus("COMPLETED")
-                .amount(BigDecimal.valueOf(200.00))
+                .amount(200.00)
                 .paymentReferenceNumber("PAY12345")
-                .order(order)
                 .build();
+
+    private final Order order = Order.builder()
+            .orderId(1L)
+            .orderStatus("PENDING")
+            .payment(payment)
+            .build();
 
     @Test
     void testProcessPayment() {
@@ -108,7 +107,7 @@ class PaymentServiceTest {
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals(payment, result.get(0));
+        assertEquals(payment, result.getFirst());
         verify(paymentRepository, times(1)).findAll();
     }
 
@@ -118,21 +117,23 @@ class PaymentServiceTest {
         Payment updatedPayment = Payment.builder()
                 .paymentMethod("DEBIT_CARD")
                 .paymentStatus("COMPLETED")
-                .amount(BigDecimal.valueOf(250.00))
+                .amount(250.00)
                 .paymentReferenceNumber("PAY54321")
                 .build();
 
         when(paymentRepository.findById(payment.getPaymentId())).thenReturn(of(payment));
-        when(paymentRepository.save(any(Payment.class))).thenReturn(payment);
+        when(paymentRepository.save(any(Payment.class))).thenReturn(updatedPayment);
+        when(orderRepository.findByPayment(any(Payment.class))).thenReturn(of(order));
 
         Payment result = paymentService.updatePayment(payment.getPaymentId(), updatedPayment);
 
         assertNotNull(result);
         assertEquals("DEBIT_CARD", result.getPaymentMethod());
         assertEquals("COMPLETED", result.getPaymentStatus());
-        assertEquals(BigDecimal.valueOf(250.00), result.getAmount());
+        assertEquals(250.00, result.getAmount());
         verify(paymentRepository, times(1)).findById(payment.getPaymentId());
         verify(paymentRepository, times(1)).save(any(Payment.class));
+        verify(orderRepository, times(1)).findByPayment(any(Payment.class));
         verify(orderRepository, times(1)).save(order);
     }
 
@@ -144,7 +145,7 @@ class PaymentServiceTest {
                 .paymentDate(LocalDate.now())
                 .paymentMethod("CREDIT_CARD")
                 .paymentStatus("PENDING")
-                .amount(BigDecimal.valueOf(200.00))
+                .amount(200.00)
                 .paymentReferenceNumber("PAY12345")
                 .build();
         when(paymentRepository.findById(paymentForDelete.getPaymentId())).thenReturn(of(paymentForDelete));

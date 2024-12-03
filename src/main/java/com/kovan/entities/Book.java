@@ -1,15 +1,12 @@
 package com.kovan.entities;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import lombok.*;
-import java.math.BigDecimal;
-import java.util.List;
 
 @Entity
-@Table(name = "books")
+@Table(name = "book")
 @Data
 @Builder
 @NoArgsConstructor
@@ -23,7 +20,7 @@ public class Book {
     private String title;
     private String author;
     private String genre;
-    private BigDecimal price;
+    private Double price;
 
     @Column(unique = true)
     private String isbn;
@@ -34,17 +31,8 @@ public class Book {
     private String description;
     private String coverImage;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
-    @JsonManagedReference
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "category_id")
     private Category category;
-
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private List<Review> reviews;
-
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private List<InventoryTransaction> inventoryTransactions;
 
 }

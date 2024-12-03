@@ -1,6 +1,5 @@
 package com.kovan.entities;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import jakarta.persistence.*;
 import java.util.List;
@@ -19,29 +18,19 @@ public class User {
     private String firstName;
     private String lastName;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String email;
 
     private String passwordHash;
     private String dateOfBirth;
     private String role;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<Address> addresses;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private List<Address> shippingAddresses;
 
-    @OneToOne
-    @JoinColumn(name = "shipping_address_id", referencedColumnName = "addressID")
-    @JsonManagedReference
-    private Address shippingAddress;
-
-    @OneToOne
-    @JoinColumn(name = "billing_address_id", referencedColumnName = "addressID")
-    @JsonManagedReference
-    private Address billingAddress;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private ShoppingCart shoppingCart;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private List<Address> billingAddresses;
 
 }

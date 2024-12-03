@@ -1,17 +1,13 @@
 package com.kovan.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import lombok.*;
-
-import java.time.LocalDateTime;
-import java.util.List;
+import java.time.LocalDate;
 
 @Entity
-@Table(name = "orders")
+@Table(name = "order_table")
 @Data
 @Builder
 @AllArgsConstructor
@@ -22,26 +18,20 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
 
-    private LocalDateTime orderDate;
+    private LocalDate orderDate;
 
-    private String orderStatus;
+    private String orderStatus;  // Pending, Shipped, Delivered, Cancelled
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", nullable = false)
-    @JsonBackReference
+    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @JoinColumn(name = "userId")
     private User user;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "shipping_address_id", nullable = false)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "shippingAddressId")
     private Address shippingAddress;
 
-    @OneToOne
-    @JoinColumn(name = "payment_id")
-    @JsonManagedReference
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "paymentId")
     private Payment payment;
-
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private List<OrderItem> orderItems;
 
 }

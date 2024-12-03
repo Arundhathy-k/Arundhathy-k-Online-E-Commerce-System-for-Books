@@ -7,7 +7,6 @@ import com.kovan.repository.BookRepository;
 import com.kovan.repository.OrderItemRepository;
 import com.kovan.repository.OrderRepository;
 import org.springframework.stereotype.Service;
-import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -25,14 +24,14 @@ public class OrderItemService {
         this.bookRepository = bookRepository;
     }
 
-    public OrderItem addOrderItem(Long orderId, Long bookId, int quantity, BigDecimal unitPrice) {
+    public OrderItem addOrderItem(Long orderId, Long bookId, int quantity, Double unitPrice) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found"));
 
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new IllegalArgumentException("Book not found"));
 
-        BigDecimal totalPrice = unitPrice.multiply(BigDecimal.valueOf(quantity));
+       Double totalPrice = unitPrice * quantity;
 
         OrderItem orderItem = OrderItem.builder()
                 .order(order)
