@@ -28,7 +28,7 @@ public class ReviewController {
     @DeleteMapping("/remove")
     public ResponseEntity<Void> deleteReview(@RequestParam Long userId,
                                              @RequestParam Long bookId) {
-        reviewService.deleteReview(userId);
+        reviewService.deleteReview(userId,bookId);
         return ResponseEntity.noContent().build();
     }
 }

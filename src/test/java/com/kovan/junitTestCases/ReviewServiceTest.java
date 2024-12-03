@@ -13,10 +13,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import java.util.Optional;
+import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
 class ReviewServiceTest {
@@ -33,30 +33,28 @@ class ReviewServiceTest {
     @InjectMocks
     private ReviewService reviewService;
 
-
     private final User user = User.builder()
-                .userId(1L)
-                .build();
+            .userId(1L)
+            .build();
 
     private final Book book = Book.builder()
-                .bookId(1L)
-                .build();
+            .bookId(1L)
+            .build();
 
     private final Review review = Review.builder()
-                .reviewId(1L)
-                .user(user)
-                .book(book)
-                .rating(5)
-                .comment("Great book!")
-                .reviewDate(LocalDate.now())
-                .build();
+            .reviewId(1L)
+            .user(user)
+            .book(book)
+            .rating(5)
+            .comment("Great book!")
+            .reviewDate(LocalDate.now())
+            .build();
 
     @Test
     void testAddOrUpdateReview_NewReview() {
-
-        when(reviewRepository.findByBookBookId(book.getBookId())).thenReturn(empty());
-        when(userRepository.findById(user.getUserId())).thenReturn(of(user));
-        when(bookRepository.findById(book.getBookId())).thenReturn(of(book));
+        when(userRepository.findById(user.getUserId())).thenReturn(Optional.of(user));
+        when(bookRepository.findById(book.getBookId())).thenReturn(Optional.of(book));
+        when(reviewRepository.findByUserAndBook(user, book)).thenReturn(Optional.empty());
         when(reviewRepository.save(any(Review.class))).thenReturn(review);
 
         Review result = reviewService.addOrUpdateReview(user.getUserId(), book.getBookId(), 5, "Great book!");
@@ -65,16 +63,17 @@ class ReviewServiceTest {
         assertEquals(review.getReviewId(), result.getReviewId());
         assertEquals(5, result.getRating());
         assertEquals("Great book!", result.getComment());
-        verify(reviewRepository, times(1)).findByBookBookId(book.getBookId());
         verify(userRepository, times(1)).findById(user.getUserId());
         verify(bookRepository, times(1)).findById(book.getBookId());
+        verify(reviewRepository, times(1)).findByUserAndBook(user, book);
         verify(reviewRepository, times(1)).save(any(Review.class));
     }
 
     @Test
     void testAddOrUpdateReview_UpdateExistingReview() {
-
-        when(reviewRepository.findByBookBookId(book.getBookId())).thenReturn(of(review));
+        when(userRepository.findById(user.getUserId())).thenReturn(Optional.of(user));
+        when(bookRepository.findById(book.getBookId())).thenReturn(Optional.of(book));
+        when(reviewRepository.findByUserAndBook(user, book)).thenReturn(Optional.of(review));
         when(reviewRepository.save(any(Review.class))).thenReturn(review);
 
         Review result = reviewService.addOrUpdateReview(user.getUserId(), book.getBookId(), 4, "Good book!");
@@ -83,68 +82,71 @@ class ReviewServiceTest {
         assertEquals(review.getReviewId(), result.getReviewId());
         assertEquals(4, result.getRating());
         assertEquals("Good book!", result.getComment());
-        verify(reviewRepository, times(1)).findByBookBookId(book.getBookId());
+        verify(userRepository, times(1)).findById(user.getUserId());
+        verify(bookRepository, times(1)).findById(book.getBookId());
+        verify(reviewRepository, times(1)).findByUserAndBook(user, book);
         verify(reviewRepository, times(1)).save(any(Review.class));
-        verifyNoInteractions(userRepository);
-        verifyNoInteractions(bookRepository);
     }
 
     @Test
     void testAddOrUpdateReview_UserNotFound() {
-
-        when(reviewRepository.findByBookBookId(book.getBookId())).thenReturn(empty());
-        when(userRepository.findById(user.getUserId())).thenReturn(empty());
+        when(userRepository.findById(user.getUserId())).thenReturn(Optional.empty());
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             reviewService.addOrUpdateReview(user.getUserId(), book.getBookId(), 5, "Great book!");
         });
 
         assertEquals("User not found!", exception.getMessage());
-        verify(reviewRepository, times(1)).findByBookBookId(book.getBookId());
         verify(userRepository, times(1)).findById(user.getUserId());
-        verifyNoInteractions(bookRepository);
+        verifyNoMoreInteractions(bookRepository);
+        verifyNoInteractions(reviewRepository);
     }
 
     @Test
     void testAddOrUpdateReview_BookNotFound() {
-
-        when(reviewRepository.findByBookBookId(book.getBookId())).thenReturn(empty());
-        when(userRepository.findById(user.getUserId())).thenReturn(of(user));
-        when(bookRepository.findById(book.getBookId())).thenReturn(empty());
+        when(userRepository.findById(user.getUserId())).thenReturn(Optional.of(user));
+        when(bookRepository.findById(book.getBookId())).thenReturn(Optional.empty());
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             reviewService.addOrUpdateReview(user.getUserId(), book.getBookId(), 5, "Great book!");
         });
 
         assertEquals("Book not found!", exception.getMessage());
-        verify(reviewRepository, times(1)).findByBookBookId(book.getBookId());
         verify(userRepository, times(1)).findById(user.getUserId());
         verify(bookRepository, times(1)).findById(book.getBookId());
+        verifyNoInteractions(reviewRepository);
     }
 
     @Test
     void testDeleteReview() {
+        when(userRepository.findById(user.getUserId())).thenReturn(Optional.of(user));
+        when(bookRepository.findById(book.getBookId())).thenReturn(Optional.of(book));
+        when(reviewRepository.findByUserAndBook(user, book)).thenReturn(Optional.of(review));
 
-        when(reviewRepository.findByBookBookId(book.getBookId())).thenReturn(of(review));
+        reviewService.deleteReview(user.getUserId(), book.getBookId());
 
-        reviewService.deleteReview(book.getBookId());
-
-        verify(reviewRepository, times(1)).findByBookBookId(book.getBookId());
+        verify(userRepository, times(1)).findById(user.getUserId());
+        verify(bookRepository, times(1)).findById(book.getBookId());
+        verify(reviewRepository, times(1)).findByUserAndBook(user, book);
         verify(reviewRepository, times(1)).delete(review);
     }
 
     @Test
     void testDeleteReview_ThrowsExceptionWhenNotFound() {
-
-        when(reviewRepository.findByBookBookId(book.getBookId())).thenReturn(empty());
+        when(userRepository.findById(user.getUserId())).thenReturn(Optional.of(user));
+        when(bookRepository.findById(book.getBookId())).thenReturn(Optional.of(book));
+        when(reviewRepository.findByUserAndBook(user, book)).thenReturn(Optional.empty());
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            reviewService.deleteReview(book.getBookId());
+            reviewService.deleteReview(user.getUserId(), book.getBookId());
         });
 
         assertEquals("Review not found!", exception.getMessage());
-        verify(reviewRepository, times(1)).findByBookBookId(book.getBookId());
+        verify(userRepository, times(1)).findById(user.getUserId());
+        verify(bookRepository, times(1)).findById(book.getBookId());
+        verify(reviewRepository, times(1)).findByUserAndBook(user, book);
         verify(reviewRepository, never()).delete(any());
     }
 }
+
 

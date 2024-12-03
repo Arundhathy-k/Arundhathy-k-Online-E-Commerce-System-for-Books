@@ -23,12 +23,18 @@ public class Payment {
 
     private LocalDate paymentDate;
 
-    private String paymentMethod;
+    private String paymentMethod; // Credit card, PayPal
 
-    private String  paymentStatus;
+    private String  paymentStatus; // Completed, Pending, Failed
 
     private Double amount;
 
     private String paymentReferenceNumber;
+
+    private String transactionType; // Purchase,Return,Restock
+
+    private int transactionQuantity; // the quantity of books involved in the transaction
+
+    private String transactionNotes; //any additional information, such as reason for return or restocking
 
 }

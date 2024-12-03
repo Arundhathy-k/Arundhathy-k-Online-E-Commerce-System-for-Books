@@ -4,13 +4,13 @@ import com.kovan.entities.Category;
 import com.kovan.repository.CategoryRepository;
 import com.kovan.service.CategoryService;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.*;
 
 @SpringBootTest
 @Transactional
@@ -22,14 +22,14 @@ class CategoryServiceIT {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    @AfterEach
+    @BeforeEach
     public void setup() {
         categoryRepository.deleteAll();
     }
 
     @Test
+    @Transactional
     void saveCategoryTest() {
-
         Category category = Category.builder()
                 .name("Fiction")
                 .description("Books that contain fictional stories")
@@ -45,7 +45,6 @@ class CategoryServiceIT {
 
     @Test
     void getCategoryByIdTest() {
-
         Category category = Category.builder()
                 .name("Science")
                 .description("Books related to science")
@@ -62,7 +61,6 @@ class CategoryServiceIT {
 
     @Test
     void getAllCategoriesTest() {
-
         Category category1 = Category.builder().name("History").description("Books about history").build();
         Category category2 = Category.builder().name("Technology").description("Books about technology").build();
 
@@ -79,7 +77,6 @@ class CategoryServiceIT {
 
     @Test
     void deleteCategoryTest() {
-
         Category category = Category.builder()
                 .name("Mystery")
                 .description("Books that involve solving mysteries")
@@ -91,6 +88,5 @@ class CategoryServiceIT {
         Optional<Category> deletedCategory = categoryRepository.findById(savedCategory.getCategoryId());
         assertThat(deletedCategory).isNotPresent();
     }
-
 }
 

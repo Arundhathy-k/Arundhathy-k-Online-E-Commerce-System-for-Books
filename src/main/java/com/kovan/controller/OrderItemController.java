@@ -22,7 +22,7 @@ public class OrderItemController {
                                                   @RequestParam Long bookId,
                                                   @RequestParam int quantity,
                                                   @RequestParam Double unitPrice) {
-        OrderItem orderItem = orderItemService.addOrderItem(orderId, bookId, quantity, unitPrice);
+        OrderItem orderItem = orderItemService.addOrderItem(bookId, quantity, unitPrice);
         return ResponseEntity.status(HttpStatus.CREATED).body(orderItem);
     }
 

@@ -6,11 +6,12 @@ import com.kovan.service.ShoppingCartService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ShoppingCartServiceIT {
 
     @Autowired
@@ -34,7 +35,8 @@ class ShoppingCartServiceIT {
     private User testUser;
     private Book testBook;
 
-    @BeforeAll
+    @BeforeEach
+    @Transactional
     void setup() {
 
         testUser = userRepository.save(
@@ -60,15 +62,12 @@ class ShoppingCartServiceIT {
     void cleanup() {
         cartItemRepository.deleteAll();
         shoppingCartRepository.deleteAll();
-    }
-
-    @AfterAll
-    void teardown() {
         bookRepository.deleteAll();
         userRepository.deleteAll();
     }
 
     @Test
+    @Transactional
     void testGetOrCreateCart_CreateNewCart() {
 
         ShoppingCart cart = shoppingCartService.getOrCreateCart(testUser.getUserId());
@@ -80,6 +79,7 @@ class ShoppingCartServiceIT {
     }
 
     @Test
+    @Transactional
     void testAddToCart_AddNewItem() {
 
         CartItem cartItem = shoppingCartService.addToCart(testUser.getUserId(), testBook.getBookId(), 2);
@@ -91,6 +91,7 @@ class ShoppingCartServiceIT {
     }
 
     @Test
+    @Transactional
     void testAddToCart_UpdateExistingItem() {
 
         ShoppingCart cart = shoppingCartService.getOrCreateCart(testUser.getUserId());
@@ -108,6 +109,7 @@ class ShoppingCartServiceIT {
     }
 
     @Test
+    @Transactional
     void testViewCart() {
 
         ShoppingCart cart = shoppingCartService.getOrCreateCart(testUser.getUserId());
@@ -126,6 +128,7 @@ class ShoppingCartServiceIT {
     }
 
     @Test
+    @Transactional
     void testRemoveFromCart_SuccessfulRemoval() {
 
         ShoppingCart cart = shoppingCartService.getOrCreateCart(testUser.getUserId());

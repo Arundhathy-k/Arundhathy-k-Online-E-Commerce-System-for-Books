@@ -1,19 +1,15 @@
 package com.kovan.integrationTestCases;
 
-import com.kovan.entities.Address;
+import com.kovan.entities.*;
 import com.kovan.entities.Order;
-import com.kovan.entities.Payment;
-import com.kovan.entities.User;
-import com.kovan.repository.AddressRepository;
-import com.kovan.repository.OrderRepository;
-import com.kovan.repository.PaymentRepository;
-import com.kovan.repository.UserRepository;
+import com.kovan.repository.*;
 import com.kovan.service.PaymentService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,8 +31,12 @@ class PaymentServiceIT {
     @Autowired
     private AddressRepository addressRepository;
 
+    @Autowired
+    private BookRepository bookRepository;
+
     private Order order;
     private Payment payment;
+    private Book book;
 
     @BeforeEach
     @Transactional
@@ -53,6 +53,22 @@ class PaymentServiceIT {
                 .state("Dream")
                 .build();
         addressRepository.save(address);
+
+        book = Book.builder()
+                .title("Test Book")
+                .author("Author")
+                .price(20.00)
+                .stockQuantity(100)
+                .build();
+        bookRepository.save(book);
+
+        OrderItem orderItem = OrderItem.builder()
+                .book(book)
+                .quantity(2)
+                .unitPrice(20.00)
+                .totalPrice(40.00)
+                .build();
+
         payment = Payment.builder()
                 .paymentMethod("Debit Card")
                 .paymentStatus("PENDING")
@@ -61,12 +77,14 @@ class PaymentServiceIT {
                 .paymentDate(LocalDate.now())
                 .build();
         paymentRepository.save(payment);
+
         order = Order.builder()
                 .orderDate(LocalDate.now())
                 .orderStatus("PENDING")
                 .user(user)
                 .shippingAddress(address)
                 .payment(payment)
+                .orderItems(new ArrayList<>(List.of(orderItem)))
                 .build();
         orderRepository.save(order);
     }
@@ -77,6 +95,7 @@ class PaymentServiceIT {
         orderRepository.deleteAll();
         addressRepository.deleteAll();
         userRepository.deleteAll();
+        bookRepository.deleteAll();
     }
 
     @Test
@@ -98,12 +117,15 @@ class PaymentServiceIT {
         assertNotNull(updatedOrder);
         assertEquals("SHIPPED", updatedOrder.getOrderStatus());
         assertEquals(savedPayment.getPaymentId(), updatedOrder.getPayment().getPaymentId());
+
+        Book updatedBook = bookRepository.findById(book.getBookId()).orElse(null);
+        assertNotNull(updatedBook);
+        assertEquals(98, updatedBook.getStockQuantity());
     }
 
     @Test
     @Transactional
     void testGetPaymentById() {
-
         Payment fetchedPayment = paymentService.getPaymentById(payment.getPaymentId());
 
         assertNotNull(fetchedPayment);
@@ -138,7 +160,6 @@ class PaymentServiceIT {
     @Test
     @Transactional
     void testUpdatePayment() {
-
         Payment updatedDetails = Payment.builder()
                 .paymentMethod("Card")
                 .paymentStatus("COMPLETED")
@@ -152,39 +173,43 @@ class PaymentServiceIT {
         assertEquals("Card", updatedPayment.getPaymentMethod());
         assertEquals(350.00, updatedPayment.getAmount());
         assertEquals("PAY_UPDATED", updatedPayment.getPaymentReferenceNumber());
+
+        Book updatedBook = bookRepository.findById(book.getBookId()).orElse(null);
+        assertNotNull(updatedBook);
+        assertEquals(98, updatedBook.getStockQuantity());
     }
 
     @Test
     @Transactional
     void testDeletePayment() {
-         payment = Payment.builder()
+        Payment pendingPayment = Payment.builder()
                 .paymentMethod("Wallet")
                 .paymentStatus("PENDING")
                 .amount(400.00)
                 .paymentReferenceNumber("PAY128")
                 .paymentDate(LocalDate.now())
                 .build();
-        payment = paymentRepository.save(payment);
+        pendingPayment = paymentRepository.save(pendingPayment);
 
-        paymentService.deletePayment(payment.getPaymentId());
+        paymentService.deletePayment(pendingPayment.getPaymentId());
 
-        assertFalse(paymentRepository.existsById(payment.getPaymentId()));
+        assertFalse(paymentRepository.existsById(pendingPayment.getPaymentId()));
     }
 
     @Test
     @Transactional
     void testDeleteCompletedPaymentThrowsException() {
-         payment = Payment.builder()
+        Payment completedPayment = Payment.builder()
                 .paymentMethod("Wallet")
                 .paymentStatus("COMPLETED")
                 .amount(450.00)
                 .paymentReferenceNumber("PAY129")
                 .paymentDate(LocalDate.now())
                 .build();
-        payment = paymentRepository.save(payment);
+        Payment finalCompletedPayment = paymentRepository.save(completedPayment);
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            paymentService.deletePayment(payment.getPaymentId());
+            paymentService.deletePayment(finalCompletedPayment.getPaymentId());
         });
 
         assertEquals("Cannot delete a completed payment associated with an order!", exception.getMessage());

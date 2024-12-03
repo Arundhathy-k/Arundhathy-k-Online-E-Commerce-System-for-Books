@@ -8,18 +8,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import java.time.LocalDate;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
+import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
+@Transactional
 class OrderItemServiceIT {
 
     @Autowired
     private OrderItemService orderItemService;
-
-    @Autowired
-    private OrderRepository orderRepository;
 
     @Autowired
     private BookRepository bookRepository;
@@ -36,31 +34,27 @@ class OrderItemServiceIT {
     @Autowired
     private UserRepository userRepository;
 
-    private Order savedOrder;
     private Book savedBook;
 
     @BeforeEach
     void setup() {
+        // Ensure all data is cleaned up before starting tests
+        cleanup();
 
         User user = User.builder()
                 .firstName("Test User")
                 .email("Test@gmail.com")
                 .build();
         userRepository.save(user);
+
         Address address = Address.builder()
                 .city("Test City")
                 .state("Test State")
                 .build();
         addressRepository.save(address);
-        savedOrder = orderRepository.save(
-                Order.builder()
-                        .orderDate(LocalDate.now())
-                        .user(user)
-                        .shippingAddress(address)
-                        .build());
 
         Category testCategory = Category.builder().name("Fiction").build();
-        categoryRepository.save(testCategory);
+        testCategory = categoryRepository.save(testCategory);
 
         savedBook = bookRepository.save(
                 Book.builder()
@@ -74,9 +68,7 @@ class OrderItemServiceIT {
 
     @AfterEach
     void cleanup() {
-
         orderItemRepository.deleteAll();
-        orderRepository.deleteAll();
         bookRepository.deleteAll();
         categoryRepository.deleteAll();
         addressRepository.deleteAll();
@@ -85,19 +77,16 @@ class OrderItemServiceIT {
 
     @Test
     void testAddOrderItem() {
-
         int quantity = 2;
         Double unitPrice = 20.00;
 
         OrderItem orderItem = orderItemService.addOrderItem(
-                savedOrder.getOrderId(),
                 savedBook.getBookId(),
                 quantity,
                 unitPrice
         );
 
         assertNotNull(orderItem.getOrderItemId());
-        assertEquals(savedOrder.getOrderId(), orderItem.getOrder().getOrderId());
         assertEquals(savedBook.getBookId(), orderItem.getBook().getBookId());
         assertEquals(quantity, orderItem.getQuantity());
         assertEquals(unitPrice, orderItem.getUnitPrice());
@@ -106,17 +95,14 @@ class OrderItemServiceIT {
 
     @Test
     void testGetAllOrderItems() {
-
         OrderItem orderItem1 = OrderItem.builder()
-                .order(savedOrder)
                 .book(savedBook)
                 .quantity(1)
                 .unitPrice(20.00)
-                .totalPrice((20.00))
+                .totalPrice(20.00)
                 .build();
 
         OrderItem orderItem2 = OrderItem.builder()
-                .order(savedOrder)
                 .book(savedBook)
                 .quantity(3)
                 .unitPrice(15.00)
@@ -132,10 +118,8 @@ class OrderItemServiceIT {
 
     @Test
     void testGetOrderItemById() {
-
         OrderItem orderItem = orderItemRepository.save(
                 OrderItem.builder()
-                        .order(savedOrder)
                         .book(savedBook)
                         .quantity(2)
                         .unitPrice(20.00)
@@ -151,10 +135,8 @@ class OrderItemServiceIT {
 
     @Test
     void testDeleteOrderItem() {
-
         OrderItem orderItem = orderItemRepository.save(
                 OrderItem.builder()
-                        .order(savedOrder)
                         .book(savedBook)
                         .quantity(2)
                         .unitPrice(20.00)

@@ -23,7 +23,7 @@ public class User {
 
     private String passwordHash;
     private String dateOfBirth;
-    private String role;
+    private String role; // Admin, Customer
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")

@@ -1,14 +1,11 @@
 package com.kovan.service;
 
-import com.kovan.entities.Address;
-import com.kovan.entities.Order;
-import com.kovan.entities.Payment;
-import com.kovan.entities.User;
+import com.kovan.entities.*;
+import com.kovan.repository.BookRepository;
 import com.kovan.repository.OrderRepository;
 import com.kovan.repository.PaymentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 @Service
@@ -18,12 +15,14 @@ public class OrderService {
     private final UserService userService;
     private final AddressService addressService;
     private final PaymentRepository paymentRepository;
+    private final BookRepository bookRepository;
 
-    public OrderService(OrderRepository orderRepository, UserService userService, AddressService addressService, PaymentRepository paymentRepository) {
+    public OrderService(OrderRepository orderRepository, UserService userService, AddressService addressService, PaymentRepository paymentRepository, BookRepository bookRepository) {
         this.orderRepository = orderRepository;
         this.userService = userService;
         this.addressService = addressService;
         this.paymentRepository = paymentRepository;
+        this.bookRepository = bookRepository;
     }
 
     @Transactional
@@ -62,6 +61,7 @@ public class OrderService {
         return orderRepository.save(existingOrder);
     }
 
+    @Transactional
     public void cancelOrder(Long id) {
         Order order = getOrderById(id);
 
@@ -78,7 +78,18 @@ public class OrderService {
         Payment payment = order.getPayment();
         if (payment != null && "COMPLETED".equalsIgnoreCase(payment.getPaymentStatus())) {
             payment.setPaymentStatus("REFUNDED");
+            payment.setTransactionType("RETURN");
             paymentRepository.save(payment);
+            incrementStock(order,payment.getTransactionQuantity());
         }
+    }
+
+    private void incrementStock(Order order, int transactionQuantity) {
+        order.getOrderItems().forEach(orderItem -> {
+            Book book = bookRepository.findById(orderItem.getBook().getBookId())
+                    .orElseThrow(() -> new RuntimeException("Book not found!"));
+            book.setStockQuantity(book.getStockQuantity() + transactionQuantity);
+            bookRepository.save(book);
+        });
     }
 }

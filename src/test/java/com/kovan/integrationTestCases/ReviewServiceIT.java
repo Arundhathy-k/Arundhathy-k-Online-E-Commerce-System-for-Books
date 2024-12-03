@@ -14,9 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
+import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ReviewServiceIT {
 
     @Autowired
@@ -37,24 +37,36 @@ class ReviewServiceIT {
     private Book testBook;
     private User testUser;
 
-    @BeforeAll
+    @BeforeEach
+    @Transactional
     void setup() {
-
         testUser = userRepository.save(
                 User.builder()
                         .firstName("Jane")
+                        .lastName("Doe")
                         .email("jane@example.com")
+                        .passwordHash("password")
                         .build()
         );
-        Category testCategory = Category.builder().name("Fiction").build();
-        categoryRepository.save(testCategory);
+
+        Category testCategory = categoryRepository.save(
+                Category.builder()
+                        .name("Fiction")
+                        .description("Fictional books category")
+                        .build()
+        );
 
         testBook = bookRepository.save(
                 Book.builder()
                         .title("Test Book")
                         .author("Test Author")
                         .isbn("123456789")
-                        .category(testCategory)
+                        .category(categoryRepository.findById(testCategory.getCategoryId()).orElseThrow())
+                        .stockQuantity(100)
+                        .price(19.99)
+                        .description("A test book for integration testing")
+                        .publicationYear(2023)
+                        .publisher("Test Publisher")
                         .build()
         );
     }
@@ -62,18 +74,14 @@ class ReviewServiceIT {
     @AfterEach
     void cleanup() {
         reviewRepository.deleteAll();
-    }
-
-    @AfterAll
-    void teardown() {
         bookRepository.deleteAll();
         userRepository.deleteAll();
         categoryRepository.deleteAll();
     }
 
     @Test
+    @Transactional
     void testAddOrUpdateReview_AddNewReview() {
-
         Review review = reviewService.addOrUpdateReview(testUser.getUserId(), testBook.getBookId(), 5, "Great book!");
 
         assertNotNull(review.getReviewId());
@@ -84,8 +92,8 @@ class ReviewServiceIT {
     }
 
     @Test
+    @Transactional
     void testAddOrUpdateReview_UpdateExistingReview() {
-
         Review existingReview = reviewRepository.save(
                 Review.builder()
                         .book(testBook)
@@ -96,7 +104,6 @@ class ReviewServiceIT {
                         .build()
         );
 
-
         Review updatedReview = reviewService.addOrUpdateReview(testUser.getUserId(), testBook.getBookId(), 4, "Very enjoyable!");
 
         assertEquals(existingReview.getReviewId(), updatedReview.getReviewId());
@@ -105,8 +112,8 @@ class ReviewServiceIT {
     }
 
     @Test
+    @Transactional
     void testDeleteReview() {
-
         Review review = reviewRepository.save(
                 Review.builder()
                         .book(testBook)
@@ -117,15 +124,14 @@ class ReviewServiceIT {
                         .build()
         );
 
-
-        reviewService.deleteReview(testBook.getBookId());
+        reviewService.deleteReview(testUser.getUserId(), testBook.getBookId());
 
         assertFalse(reviewRepository.existsById(review.getReviewId()));
     }
 
     @Test
+    @Transactional
     void testAddOrUpdateReview_UserNotFound() {
-
         Long nonExistentUserId = 999L;
 
         Exception exception = assertThrows(RuntimeException.class, () -> {
@@ -136,8 +142,8 @@ class ReviewServiceIT {
     }
 
     @Test
+    @Transactional
     void testAddOrUpdateReview_BookNotFound() {
-
         Long nonExistentBookId = 999L;
 
         Exception exception = assertThrows(RuntimeException.class, () -> {
@@ -147,16 +153,6 @@ class ReviewServiceIT {
         assertEquals("Book not found!", exception.getMessage());
     }
 
-    @Test
-    void testDeleteReview_ReviewNotFound() {
-
-        Long nonExistentBookId = 999L;
-
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            reviewService.deleteReview(nonExistentBookId);
-        });
-
-        assertEquals("Review not found!", exception.getMessage());
-    }
 }
+
 

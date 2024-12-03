@@ -3,6 +3,8 @@ package com.kovan.service;
 import com.kovan.entities.Book;
 import com.kovan.repository.BookRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Service
@@ -14,6 +16,7 @@ public class BookService {
         this.bookRepository = bookRepository;
     }
 
+    @Transactional
     public Book addBook(Book book) {
         return bookRepository.save(book);
     }
@@ -28,6 +31,8 @@ public class BookService {
     public void deleteBook(Long id) {
         bookRepository.deleteById(id);
     }
+
+    @Transactional
     public Book updateBook(Long id, Book updatedBook) {
         Book book = getBookById(id);
         book.setTitle(updatedBook.getTitle());

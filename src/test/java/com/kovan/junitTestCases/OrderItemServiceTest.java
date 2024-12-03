@@ -1,11 +1,9 @@
 package com.kovan.junitTestCases;
 
 import com.kovan.entities.Book;
-import com.kovan.entities.Order;
 import com.kovan.entities.OrderItem;
 import com.kovan.repository.BookRepository;
 import com.kovan.repository.OrderItemRepository;
-import com.kovan.repository.OrderRepository;
 import com.kovan.service.OrderItemService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,18 +22,10 @@ class OrderItemServiceTest {
     private OrderItemRepository orderItemRepository;
 
     @Mock
-    private OrderRepository orderRepository;
-
-    @Mock
     private BookRepository bookRepository;
 
     @InjectMocks
     private OrderItemService orderItemService;
-
-    private final Order order = Order.builder()
-            .orderId(1L)
-            .orderStatus("PENDING")
-            .build();
 
     private final Book book =  Book.builder()
             .bookId(1L)
@@ -45,7 +35,6 @@ class OrderItemServiceTest {
 
     private final OrderItem orderItem = OrderItem.builder()
             .orderItemId(1L)
-            .order(order)
             .book(book)
             .quantity(2)
             .unitPrice(50.00)
@@ -55,12 +44,10 @@ class OrderItemServiceTest {
     @Test
     void testAddOrderItem() {
 
-        when(orderRepository.findById(order.getOrderId())).thenReturn(of(order));
         when(bookRepository.findById(book.getBookId())).thenReturn(of(book));
         when(orderItemRepository.save(any(OrderItem.class))).thenReturn(orderItem);
 
         OrderItem result = orderItemService.addOrderItem(
-                order.getOrderId(),
                 book.getBookId(),
                 2,
                 (50.00)
@@ -69,7 +56,6 @@ class OrderItemServiceTest {
         assertNotNull(result);
         assertEquals(orderItem.getOrderItemId(), result.getOrderItemId());
         assertEquals(orderItem.getTotalPrice(), result.getTotalPrice());
-        verify(orderRepository, times(1)).findById(order.getOrderId());
         verify(bookRepository, times(1)).findById(book.getBookId());
         verify(orderItemRepository, times(1)).save(any(OrderItem.class));
     }
