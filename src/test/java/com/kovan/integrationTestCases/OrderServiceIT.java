@@ -8,6 +8,8 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -107,7 +109,7 @@ class OrderServiceIT {
     void testCreateOrder() {
         order = orderRepository.save(
                 Order.builder()
-                        .orderDate(LocalDate.now())
+                        .orderDate(Instant.now().toString())
                         .user(testUser)
                         .shippingAddress(testAddress)
                         .orderItems(new ArrayList<>(List.of(orderItem)))
@@ -129,7 +131,7 @@ class OrderServiceIT {
     void testGetOrderById() {
         order = orderRepository.save(
                 Order.builder()
-                        .orderDate(LocalDate.now())
+                        .orderDate(Instant.now().toString())
                         .user(testUser)
                         .shippingAddress(testAddress)
                         .orderItems(new ArrayList<>(List.of(orderItem)))
@@ -149,7 +151,7 @@ class OrderServiceIT {
     void testGetAllOrders() {
         order = orderRepository.save(
                 Order.builder()
-                        .orderDate(LocalDate.now())
+                        .orderDate(Instant.now().toString())
                         .user(testUser)
                         .shippingAddress(testAddress)
                         .orderItems(new ArrayList<>(List.of(orderItem)))
@@ -168,7 +170,7 @@ class OrderServiceIT {
     void testUpdateOrder() {
         order = orderRepository.save(
                 Order.builder()
-                        .orderDate(LocalDate.now())
+                        .orderDate(Instant.now().toString())
                         .user(testUser)
                         .shippingAddress(testAddress)
                         .orderItems(new ArrayList<>(List.of(orderItem)))
@@ -200,7 +202,7 @@ class OrderServiceIT {
     void testCancelOrder() {
         order = orderRepository.save(
                 Order.builder()
-                        .orderDate(LocalDate.now())
+                        .orderDate(Instant.now().toString())
                         .user(testUser)
                         .shippingAddress(testAddress)
                         .orderItems(new ArrayList<>(List.of(orderItem)))

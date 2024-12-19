@@ -39,11 +39,12 @@ public class CartItemService {
         return cartItemRepository.save(cartItem);
     }
 
-    public void updateCartItem(Long cartItemId, int quantity) {
+    public CartItem updateCartItem(Long cartItemId, int quantity) {
         CartItem cartItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new IllegalArgumentException("Cart item not found"));
         cartItem.setQuantity(quantity);
-        cartItemRepository.save(cartItem);
+        return cartItemRepository.save(cartItem);
+
     }
 
     public void deleteCartItem(Long cartItemId) {

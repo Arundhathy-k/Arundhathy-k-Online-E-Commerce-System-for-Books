@@ -9,7 +9,7 @@ import com.kovan.repository.CartItemRepository;
 import com.kovan.repository.ShoppingCartRepository;
 import com.kovan.repository.UserRepository;
 import org.springframework.stereotype.Service;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.Optional;
 
 @Service
@@ -37,8 +37,8 @@ public class ShoppingCartService {
                     User user = userRepository.findById(userId)
                             .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
                     cart.setUser(user);
-                    cart.setCreatedDate(LocalDate.now());
-                    cart.setLastUpdatedDate(LocalDate.now());
+                    cart.setCreatedDate(Instant.now());
+                    cart.setLastUpdatedDate(Instant.now());
                     return shoppingCartRepository.save(cart);
                 });
     }

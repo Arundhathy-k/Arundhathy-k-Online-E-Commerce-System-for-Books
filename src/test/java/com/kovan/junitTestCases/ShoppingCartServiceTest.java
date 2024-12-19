@@ -14,7 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import java.time.LocalDate;
+import java.time.Instant;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.junit.jupiter.api.Assertions.*;
@@ -49,8 +49,8 @@ class ShoppingCartServiceTest {
     private final ShoppingCart cart = ShoppingCart.builder()
                 .cartId(1L)
                 .user(user)
-                .createdDate(LocalDate.now())
-                .lastUpdatedDate(LocalDate.now())
+                .createdDate(Instant.now().toString())
+                .lastUpdatedDate(Instant.now().toString())
                 .build();
 
     private final CartItem cartItem = CartItem.builder()

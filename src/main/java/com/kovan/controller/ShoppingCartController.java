@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/shopping-cart")
+@RequestMapping("/api/shoppingCart")
 public class ShoppingCartController {
 
     private final ShoppingCartService shoppingCartService;
@@ -19,16 +19,14 @@ public class ShoppingCartController {
 
     @GetMapping("/{userId}")
     public ResponseEntity<ShoppingCart> getOrCreateCart(@PathVariable Long userId) {
-        ShoppingCart cart = shoppingCartService.getOrCreateCart(userId);
-        return ResponseEntity.ok(cart);
+        return ResponseEntity.ok(shoppingCartService.getOrCreateCart(userId));
     }
 
     @PostMapping("/add")
     public ResponseEntity<CartItem> addToCart(@RequestParam Long userId,
                                               @RequestParam Long bookId,
                                               @RequestParam int quantity) {
-        CartItem cartItem = shoppingCartService.addToCart(userId, bookId, quantity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(cartItem);
+        return ResponseEntity.status(HttpStatus.CREATED).body(shoppingCartService.addToCart(userId, bookId, quantity));
     }
 
     @DeleteMapping("/remove")
@@ -40,8 +38,7 @@ public class ShoppingCartController {
 
     @GetMapping("/view/{userId}")
     public ResponseEntity<ShoppingCart> viewCart(@PathVariable Long userId) {
-        ShoppingCart cart = shoppingCartService.viewCart(userId);
-        return ResponseEntity.ok(cart);
+        return ResponseEntity.ok(shoppingCartService.viewCart(userId));
     }
 }
 

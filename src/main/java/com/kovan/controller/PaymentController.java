@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/payments")
+@RequestMapping("/api/payment")
 public class PaymentController {
 
     private final PaymentService paymentService;
@@ -20,8 +20,7 @@ public class PaymentController {
     @PostMapping("/add")
     public ResponseEntity<Payment> processPayment(@RequestParam Long orderId,
                                                   @RequestBody Payment paymentDetails) {
-        Payment payment = paymentService.processPayment(orderId, paymentDetails);
-        return ResponseEntity.status(HttpStatus.CREATED).body(payment);
+        return ResponseEntity.status(HttpStatus.CREATED).body(paymentService.processPayment(orderId, paymentDetails));
     }
 
     @GetMapping("/{paymentId}")
@@ -32,15 +31,13 @@ public class PaymentController {
 
     @GetMapping("/fetch")
     public ResponseEntity<List<Payment>> getAllPayments() {
-        List<Payment> payments = paymentService.getAllPayments();
-        return ResponseEntity.ok(payments);
+        return ResponseEntity.ok(paymentService.getAllPayments());
     }
 
     @PutMapping("/{paymentId}")
     public ResponseEntity<Payment> updatePayment(@PathVariable Long paymentId,
                                                  @RequestBody Payment updatedPaymentDetails) {
-        Payment updatedPayment = paymentService.updatePayment(paymentId, updatedPaymentDetails);
-        return ResponseEntity.ok(updatedPayment);
+        return ResponseEntity.ok(paymentService.updatePayment(paymentId, updatedPaymentDetails));
     }
 
     @DeleteMapping("/{paymentId}")

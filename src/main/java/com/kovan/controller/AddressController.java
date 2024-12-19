@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/addresses")
+@RequestMapping("/api/address")
 public class AddressController {
 
     private final AddressService addressService;
@@ -18,26 +18,22 @@ public class AddressController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Address> getAddressById(@PathVariable Long id) {
-        Address address = addressService.getAddressesById(id);
-        return ResponseEntity.ok(address);
+        return ResponseEntity.ok(addressService.getAddressesById(id));
     }
 
     @GetMapping("/fetch")
     public ResponseEntity<List<Address>> getAllAddresses() {
-        List<Address> addresses = addressService.getAllAddresses();
-        return ResponseEntity.ok(addresses);
+        return ResponseEntity.ok(addressService.getAllAddresses());
     }
 
     @PostMapping("/add")
     public ResponseEntity<Address> addAddress(@RequestBody Address address) {
-        Address newAddress = addressService.addAddress(address);
-        return ResponseEntity.ok(newAddress);
+        return ResponseEntity.ok( addressService.addAddress(address));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Address> updateAddress(@PathVariable Long id, @RequestBody Address updatedAddress) {
-        Address address = addressService.updateAddress(id, updatedAddress);
-        return ResponseEntity.ok(address);
+        return ResponseEntity.ok(addressService.updateAddress(id, updatedAddress));
     }
 
     @DeleteMapping("/{id}")

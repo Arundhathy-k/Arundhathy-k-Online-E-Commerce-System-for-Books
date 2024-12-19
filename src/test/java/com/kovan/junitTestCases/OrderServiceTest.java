@@ -12,7 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -67,7 +67,7 @@ class OrderServiceTest {
 
     private final Order order = Order.builder()
             .orderId(1L)
-            .orderDate(LocalDate.now())
+            .orderDate(Instant.now().toString())
             .orderStatus("PENDING")
             .user(user)
             .shippingAddress(address)

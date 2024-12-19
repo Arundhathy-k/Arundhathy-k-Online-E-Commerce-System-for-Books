@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/order-items")
+@RequestMapping("/api/orderItem")
 public class OrderItemController {
 
     private final OrderItemService orderItemService;
@@ -22,20 +22,18 @@ public class OrderItemController {
                                                   @RequestParam Long bookId,
                                                   @RequestParam int quantity,
                                                   @RequestParam Double unitPrice) {
-        OrderItem orderItem = orderItemService.addOrderItem(bookId, quantity, unitPrice);
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderItem);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(orderItemService.addOrderItem(bookId, quantity, unitPrice));
     }
 
     @GetMapping("/fetch")
     public ResponseEntity<List<OrderItem>> getAllOrderItems() {
-        List<OrderItem> orderItems = orderItemService.getAllOrderItems();
-        return ResponseEntity.ok(orderItems);
+        return ResponseEntity.ok(orderItemService.getAllOrderItems());
     }
 
     @GetMapping("/{orderItemId}")
     public ResponseEntity<OrderItem> getOrderItemById(@PathVariable Long orderItemId) {
-        OrderItem orderItem = orderItemService.getOrderItemById(orderItemId);
-        return ResponseEntity.ok(orderItem);
+        return ResponseEntity.ok(orderItemService.getOrderItemById(orderItemId));
     }
 
     @DeleteMapping("/{orderItemId}")

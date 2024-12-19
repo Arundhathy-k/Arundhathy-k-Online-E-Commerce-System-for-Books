@@ -8,6 +8,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,13 +80,14 @@ class PaymentServiceIT {
         paymentRepository.save(payment);
 
         order = Order.builder()
-                .orderDate(LocalDate.now())
+                .orderDate(Instant.now().toString())
                 .orderStatus("PENDING")
                 .user(user)
                 .shippingAddress(address)
                 .payment(payment)
                 .orderItems(new ArrayList<>(List.of(orderItem)))
                 .build();
+
         orderRepository.save(order);
     }
 

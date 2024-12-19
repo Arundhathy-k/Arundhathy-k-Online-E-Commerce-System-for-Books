@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.time.LocalDate;
+import java.time.Instant;
 
 @Entity
 @Table(name = "shopping_cart")
@@ -25,7 +25,20 @@ public class ShoppingCart {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private LocalDate createdDate;
-    private LocalDate lastUpdatedDate;
+    private String createdDate;
+    private String lastUpdatedDate;
+
+    public void setCreatedDate(Instant createdDate) {
+        this.createdDate = createdDate.toString();
+    }
+    public Instant getCreatedDate() {
+        return Instant.parse(createdDate);
+    }
+    public void setLastUpdatedDate(Instant lastUpdatedDate) {
+        this.lastUpdatedDate = lastUpdatedDate.toString();
+    }
+    public Instant getLastUpdatedDate() {
+        return Instant.parse(lastUpdatedDate);
+    }
 
 }

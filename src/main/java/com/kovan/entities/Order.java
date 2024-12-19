@@ -4,11 +4,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import lombok.*;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 
 @Entity
-@Table(name = "order_table")
+@Table(name = "bookOrder")
 @Data
 @Builder
 @AllArgsConstructor
@@ -19,7 +19,7 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
 
-    private LocalDate orderDate;
+    private String orderDate;
 
     private String orderStatus;  // Pending, Shipped, Delivered, Cancelled
 
@@ -38,5 +38,12 @@ public class Order {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "paymentId")
     private Payment payment;
+
+    public void setOrderDate(Instant orderDate) {
+        this.orderDate = orderDate.toString();
+    }
+    public Instant getOrderDate() {
+        return Instant.parse(orderDate);
+    }
 
 }

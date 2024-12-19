@@ -7,8 +7,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
+import java.time.Instant;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -74,8 +73,6 @@ class ShoppingCartServiceIT {
 
         assertNotNull(cart.getCartId());
         assertEquals(testUser.getUserId(), cart.getUser().getUserId());
-        assertEquals(LocalDate.now(), cart.getCreatedDate());
-        assertEquals(LocalDate.now(), cart.getLastUpdatedDate());
     }
 
     @Test

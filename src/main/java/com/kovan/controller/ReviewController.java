@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/reviews")
+@RequestMapping("/api/review")
 public class ReviewController {
 
     private final ReviewService reviewService;
@@ -21,10 +21,16 @@ public class ReviewController {
                                                     @RequestParam Long bookId,
                                                     @RequestParam int rating,
                                                     @RequestParam(required = false) String comment) {
-        Review review = reviewService.addOrUpdateReview(userId, bookId, rating, comment);
-        return ResponseEntity.status(HttpStatus.CREATED).body(review);
+        return ResponseEntity.status(HttpStatus.CREATED).body(reviewService.addOrUpdateReview(userId, bookId, rating, comment));
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<Review> updateReview(@RequestParam Long userId,
+                                               @RequestParam Long bookId,
+                                               @RequestParam int rating,
+                                               @RequestParam(required = false) String comment) {
+        return ResponseEntity.ok( reviewService.addOrUpdateReview(userId, bookId, rating, comment));
+    }
     @DeleteMapping("/remove")
     public ResponseEntity<Void> deleteReview(@RequestParam Long userId,
                                              @RequestParam Long bookId) {

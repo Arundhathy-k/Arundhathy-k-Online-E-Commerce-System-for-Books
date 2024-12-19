@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/categories")
+@RequestMapping("/api/category")
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -19,20 +19,17 @@ public class CategoryController {
 
     @PostMapping("/add")
     public ResponseEntity<Category> saveCategory(@RequestBody Category category) {
-        Category savedCategory = categoryService.saveCategory(category);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedCategory);
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.saveCategory(category));
     }
 
     @GetMapping("/{categoryId}")
     public ResponseEntity<Category> getCategoryById(@PathVariable Long categoryId) {
-        Category category = categoryService.getCategoryById(categoryId);
-        return ResponseEntity.ok(category);
+        return ResponseEntity.ok(categoryService.getCategoryById(categoryId));
     }
 
     @GetMapping("/fetch")
     public ResponseEntity<List<Category>> getAllCategories() {
-        List<Category> categories = categoryService.getAllCategories();
-        return ResponseEntity.ok(categories);
+        return ResponseEntity.ok(categoryService.getAllCategories());
     }
 
     @DeleteMapping("/{categoryId}")
